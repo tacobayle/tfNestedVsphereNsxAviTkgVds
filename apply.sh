@@ -145,7 +145,7 @@ do
     fi
   fi
 done
-echo "  +++ No conflict found"
+echo "  +++ No conflict found, OK"
 #
 echo ""
 echo "==> Checking vSphere VMs for name conflict..."
@@ -158,7 +158,7 @@ do
     exit 255
   fi
 done
-echo "  +++ No conflict found"
+echo "  +++ No conflict found, OK"
 #
 echo ""
 echo "==> Checking Ubuntu Settings for external gw..."
