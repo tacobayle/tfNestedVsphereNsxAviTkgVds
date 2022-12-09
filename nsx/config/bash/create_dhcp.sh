@@ -50,5 +50,5 @@ IFS=$'\n'
 for dhcp_server in $(jq -c -r .nsx.config.dhcp_servers[] $jsonFile)
 do
   dhcp_json="{\"display_name\": \"$(echo $dhcp_server | jq -r .name)\", \"server_address\": \"$(echo $dhcp_server | jq -r .server_address)\", \"lease_time\": \"$(echo $dhcp_server | jq -r .lease_time)\"}"
-  nsx_api 18 10 "PUT" $cookies_file $headers_file "$(echo $dhcp_json)" $nsx_ip $(jq -c -r .nsx.config.dhcp_servers_api_endpoint $jsonFile)/$(echo $dhcp_server | jq -r .name)
+  nsx_api 6 10 "PUT" $cookies_file $headers_file "$(echo $dhcp_json)" $nsx_ip $(jq -c -r .nsx.config.dhcp_servers_api_endpoint $jsonFile)/$(echo $dhcp_server | jq -r .name)
 done

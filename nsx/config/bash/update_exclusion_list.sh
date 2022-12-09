@@ -46,7 +46,15 @@ nsx_api () {
 #
 /bin/bash bash/create_nsx_api_session.sh admin $TF_VAR_nsx_password $nsx_ip $cookies_file $headers_file
 IFS=$'\n'
+# retrieve current exclusion list members
+nsx_api 6 10 "GET" $cookies_file $headers_file "" $nsx_ip $(jq -c -r .nsx.config.exclusion_list_api_endpoint $jsonFile)
+members=$(echo $response_body | jq -c -r .members)
+for member in $(jq -c -r .nsx.config.exclusion_list_groups[] $jsonFile)
+do
+  members=$(echo $members | jq '. += ["/infra/domains/default/groups/'$(echo $member)'"]')
+done
 #
 # update new exclusion list members
-exclusion_json="{\"members\": \"$(echo $members | jq -c -r .)\"}"
-nsx_api 18 10 "PATCH" $cookies_file $headers_file "$(echo $exclusion_json)" $nsx_ip $(jq -c -r .nsx.config.exclusion_list_api_endpoint $jsonFile)
+exclusion_json='{"members": '$(echo $members | jq -c -r .)'}'
+echo $exclusion_json
+nsx_api 6 10 "PATCH" $cookies_file $headers_file "$(echo $exclusion_json)" $nsx_ip $(jq -c -r .nsx.config.exclusion_list_api_endpoint $jsonFile)

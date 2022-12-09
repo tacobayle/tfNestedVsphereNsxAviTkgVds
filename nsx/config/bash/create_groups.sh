@@ -50,5 +50,5 @@ IFS=$'\n'
 # create NSX group
 for group in $(jq -c -r .nsx.config.groups[] $jsonFile)
 do
-  nsx_api 18 10 "PUT" $cookies_file $headers_file "$(echo $group)" $nsx_ip $(jq -c -r .nsx.config.groups_api_endpoint $jsonFile)/$(echo $group | jq -r .display_name)
+  nsx_api 6 10 "PUT" $cookies_file $headers_file "$(echo $group)" $nsx_ip $(jq -c -r .nsx.config.groups_api_endpoint $jsonFile)/$(echo $group | jq -r .display_name)
 done
