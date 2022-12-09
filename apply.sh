@@ -141,7 +141,7 @@ do
   if [[ $(echo $folder_entry | jq -c -r .type) == "VIRTUAL_MACHINE" ]] ; then
     if [[ $(echo $folder_entry | jq -c -r .name) == $(jq -c -r .vcenter_underlay.folder $jsonFile) ]] ; then
       echo "  +++ ERROR +++ folder $(jq -c -r .vcenter_underlay.folder $jsonFile) already exists"
-      #exit 255
+      exit 255
     fi
   fi
 done
@@ -441,7 +441,7 @@ if [[ $(echo $avi_json | jq -c -r '.avi.config.virtual_services.dns | length') -
   done
 fi
 avi_json=$(echo $avi_json | jq '. | del (.avi.config.virtual_services.dns)')
-avi_json=$(echo $avi_json | jq '.avi.config.virtual_services += {"dns": '$(echo $avi_dns_vs)'}')
+avi_json=$(echo $avi_json | jq '.avi.config.virtual_services += {"dns": "'$(echo $avi_dns_vs)'"}')
 echo $avi_json | jq . | tee avi.json > /dev/null
 ## checking if Avi IPAM Networks exists in Avi cloud networks
 test_if_ref_from_list_exists_in_another_list ".avi.config.ipam.networks[]" \
