@@ -320,7 +320,7 @@
         {
           "display_name": "tier0-static",
           "ha_mode" : "ACTIVE_STANDBY",
-          "edge_cluster_name": "my-edge-cluster-01",
+          "edge_cluster_name": "edge-cluster-01",
           "interfaces" :
           [
             {
@@ -357,7 +357,7 @@
         {
           "display_name": "tier0-bgp",
           "ha_mode" : "ACTIVE_STANDBY",
-          "edge_cluster_name": "my-edge-cluster-02",
+          "edge_cluster_name": "edge-cluster-02",
           "interfaces" :
           [
             {
