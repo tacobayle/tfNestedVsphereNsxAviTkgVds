@@ -368,22 +368,8 @@ if [[ $avi_controller_network -eq 0 ]] ; then
 fi
 #
 echo "   +++ Checking Avi Cloud networks settings"
-for segment in $(jq -c -r .nsx.config.segments_overlay[] $jsonFile)
-do
-  if [[ $(echo $segment | jq -r .display_name) == $(jq -c -r .avi.config.cloud.network_management.name $jsonFile) ]] ; then
-    avi_cloud_network=1
-    echo "   ++++++ Avi cloud network found in NSX overlay segments: $(echo $segment | jq -r .display_name), OK"
-    tier1=$(echo $segment | jq -r .tier1)
-  fi
-done
-if [[ $avi_cloud_network -eq 0 ]] ; then
-  echo "   ++++++ERROR++++++ $(echo $network | jq -c -r .name) segment not found!!"
-  exit 255
-fi
-new_network=$(echo $(jq -c -r .avi.config.cloud.network_management $jsonFile) | jq '. += {"tier1": "'$(echo $tier1)'"}')
-avi_json=$(echo $avi_json | jq '. | del (.avi.config.cloud.network_management)')
-avi_json=$(echo $avi_json | jq '.avi.config.cloud += {"network_management": '$(echo $new_network)'}')
-for network in $(jq -c -r .avi.config.cloud.networks_data[] $jsonFile)
+avi_cloud_network_mgmt=0
+for network in $(jq -c -r .avi.config.cloud.networks[] $jsonFile)
 do
   network_name=$(echo $network | jq -c -r .name)
   avi_cloud_network=0
@@ -392,34 +378,89 @@ do
     if [[ $(echo $segment | jq -r .display_name) == $(echo $network | jq -c -r .name) ]] ; then
       avi_cloud_network=1
       echo "   ++++++ Avi cloud network found in NSX overlay segments: $(echo $segment | jq -r .display_name), OK"
-      tier1=$(echo $segment | jq -r .tier1)
+      cidr=$(echo $segment | jq -r .cidr)
     fi
   done
+  if [[ $(echo $(jq -c -r .vcenter.dvs.portgroup.nsx_external.name $jsonFile)-pg) == $(echo $network | jq -c -r .name) ]] ; then
+    avi_cloud_network=1
+    echo "   ++++++ Avi cloud network found in NSX external segment: $(echo $network | jq -c -r .name), OK"
+    cidr=$(jq -c -r .vcenter.dvs.portgroup.nsx_external.cidr $jsonFile)
+  fi
   if [[ $avi_cloud_network -eq 0 ]] ; then
     echo "   ++++++ERROR++++++ $(echo $network | jq -c -r .name) segment not found!!"
     exit 255
   fi
-  new_network=$(echo $network | jq '. += {"tier1": "'$(echo $tier1)'"}')
+  new_network=$(echo $network | jq '. += {"cidr": "'$(echo $cidr)'"}')
   avi_networks=$(echo $avi_networks | jq '. += ['$(echo $new_network)']')
+  if [[ $(echo $network | jq -c -r .management) == true ]] ; then
+    ((avi_cloud_network_mgmt++))
+  fi
+  if [[ $avi_cloud_network_mgmt -gt 1 ]] ; then
+    echo "   ++++++ERROR++++++ only one network can be management network in .avi.config.cloud.networks[] - found: $avi_cloud_network_mgmt !!"
+    exit 255
+  fi
 done
-avi_json=$(echo $avi_json | jq '. | del (.avi.config.cloud.networks_data)')
-avi_json=$(echo $avi_json | jq '.avi.config.cloud += {"networks_data": '$(echo $avi_networks)'}')
-#
+avi_json=$(echo $avi_json | jq '. | del (.avi.config.cloud.networks)')
+avi_json=$(echo $avi_json | jq '.avi.config.cloud += {"networks": '$(echo $avi_networks)'}')
+# copy cidr from avi.config.cloud.networks to avi.config.virtual_services.http
+if [[ $(echo $avi_json | jq -c -r '.avi.config.virtual_services.http | length') -gt 0 ]] ; then
+  avi_http_vs=[]
+  for vs in $(echo $avi_json | jq -c -r .avi.config.virtual_services.http[])
+  do
+    for network in $(echo $avi_json | jq -c -r .avi.config.cloud.networks[])
+    do
+      if [[ $(echo $network | jq -c -r .name) == $(echo $vs | jq -c -r '.network_ref') ]] ; then
+        cidr=$(echo $network | jq -r .cidr)
+      fi
+      if [[ $(echo $network | jq -c -r .name) == $(echo $vs | jq -c -r '.network_ref') ]] ; then
+        type=$(echo $network | jq -r .type)
+      fi
+    done
+    new_vs_http=$(echo $vs | jq '. += {"cidr": "'$(echo $cidr)'", "type": "'$(echo $type)'"}')
+    avi_http_vs=$(echo $avi_dns_vs | jq '. += ['$(echo $new_vs_http)']')
+  done
+fi
+# copy cidr from avi.config.cloud.networks to avi.config.virtual_services.dns
+if [[ $(echo $avi_json | jq -c -r '.avi.config.virtual_services.dns | length') -gt 0 ]] ; then
+  avi_dns_vs=[]
+  for vs in $(echo $avi_json | jq -c -r .avi.config.virtual_services.dns[])
+  do
+    for network in $(echo $avi_json | jq -c -r .avi.config.cloud.networks[])
+    do
+      if [[ $(echo $network | jq -c -r .name) == $(echo $vs | jq -c -r '.network_ref') ]] ; then
+        cidr=$(echo $network | jq -r .cidr)
+      fi
+      if [[ $(echo $network | jq -c -r .name) == $(echo $vs | jq -c -r '.network_ref') ]] ; then
+        type=$(echo $network | jq -r .type)
+      fi
+    done
+    new_vs_dns=$(echo $vs | jq '. += {"cidr": "'$(echo $cidr)'", "type": "'$(echo $type)'"}')
+    avi_dns_vs=$(echo $avi_dns_vs | jq '. += ['$(echo $new_vs_dns)']')
+  done
+fi
+avi_json=$(echo $avi_json | jq '. | del (.avi.config.virtual_services.dns)')
+avi_json=$(echo $avi_json | jq '.avi.config.virtual_services += {"dns": '$(echo $avi_dns_vs)'}')
 echo $avi_json | jq . | tee avi.json > /dev/null
-#
+## checking if Avi IPAM Networks exists in Avi cloud networks
+test_if_ref_from_list_exists_in_another_list ".avi.config.ipam.networks[]" \
+                                             ".avi.config.cloud.networks[].name" \
+                                             "$jsonFile" \
+                                             "   +++ Checking IPAM networks" \
+                                             "   ++++++ Avi IPAM network " \
+                                             "   ++++++ERROR++++++ Network not found: "
 # checking if seg ref in DNS VS exist in seg list
-if [ $(jq -c -r '.avi.config.cloud.virtual_services.dns | length' $jsonFile) -gt 0 ] ; then
-  test_if_ref_from_list_exists_in_another_list ".avi.config.cloud.virtual_services.dns[].se_group_ref" \
-                                               ".avi.config.cloud.service_engine_groups[].name" \
+if [ $(jq -c -r '.avi.config.virtual_services.dns | length' $jsonFile) -gt 0 ] ; then
+  test_if_ref_from_list_exists_in_another_list ".avi.config.virtual_services.dns[].se_group_ref" \
+                                               ".avi.config.service_engine_groups[].name" \
                                                "$jsonFile" \
                                                "   +++ Checking Service Engine Group in DNS VS" \
                                                "   ++++++ Service Engine Group " \
                                                "   ++++++ERROR++++++ segment not found: "
 fi
 # checking if seg ref in HTTP VS exist in seg list
-if [ $(jq -c -r '.avi.config.cloud.virtual_services.http | length' $jsonFile) -gt 0 ] ; then
-  test_if_ref_from_list_exists_in_another_list ".avi.config.cloud.virtual_services.http[].se_group_ref" \
-                                               ".avi.config.cloud.service_engine_groups[].name" \
+if [ $(jq -c -r '.avi.config.virtual_services.http | length' $jsonFile) -gt 0 ] ; then
+  test_if_ref_from_list_exists_in_another_list ".avi.config.virtual_services.http[].se_group_ref" \
+                                               ".avi.config.service_engine_groups[].name" \
                                                "$jsonFile" \
                                                "   +++ Checking Service Engine Group in HTTP VS" \
                                                "   ++++++ Service Engine Group " \
