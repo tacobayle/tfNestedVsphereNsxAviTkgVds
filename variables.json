@@ -328,14 +328,14 @@
               "segment_name": "segment-external",
               "type" : "EXTERNAL",
               "display_name" : "if-ext-0",
-              "description": "this will consume IP defines in .vcentertfNestedVsphereNsxAviTkgVdsportgroup.nsx_external.tier0_ips"
+              "description": "this will consume IP defines in .vcenter.vds.portgroup.nsx_external.tier0_ips"
             },
             {
               "edge_name": "edge-02",
               "segment_name": "segment-external",
               "type" : "EXTERNAL",
               "display_name" : "if-ext-1",
-              "description": "this will consume IP defines in .vcentertfNestedVsphereNsxAviTkgVdsportgroup.nsx_external.tier0_ips"
+              "description": "this will consume IP defines in .vcenter.vds.portgroup.nsx_external.tier0_ips"
             }
           ],
           "static_routes":
@@ -350,7 +350,7 @@
           [
             {
               "interfaces" : ["if-ext-0", "if-ext-1"],
-              "description": "this will consume IP defines in .vcentertfNestedVsphereNsxAviTkgVdsportgroup.nsx_external.tier0_vips"
+              "description": "this will consume IP defines in .vcenter.vds.portgroup.nsx_external.tier0_vips"
             }
           ]
         },
@@ -365,14 +365,14 @@
               "segment_name": "segment-external",
               "type" : "EXTERNAL",
               "display_name" : "if-ext-0",
-              "description": "this will consume IP defines in .vcentertfNestedVsphereNsxAviTkgVdsportgroup.nsx_external.tier0_ips"
+              "description": "this will consume IP defines in .vcenter.vds.portgroup.nsx_external.tier0_ips"
             },
             {
               "edge_name": "edge-04",
               "segment_name": "segment-external",
               "type" : "EXTERNAL",
               "display_name" : "if-ext-1",
-              "description": "this will consume IP defines in .vcentertfNestedVsphereNsxAviTkgVdsportgroup.nsx_external.tier0_ips"
+              "description": "this will consume IP defines in .vcenter.vds.portgroup.nsx_external.tier0_ips"
             }
           ],
           "static_routes":
@@ -387,7 +387,7 @@
           [
             {
               "interfaces" : ["if-ext-0", "if-ext-1"],
-              "description": "this will consume IP defines in .vcentertfNestedVsphereNsxAviTkgVdsportgroup.nsx_external.tier0_vips"
+              "description": "this will consume IP defines in .vcenter.vds.portgroup.nsx_external.tier0_vips"
             }
           ]
         }

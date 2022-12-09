@@ -208,8 +208,8 @@ if [[ $(jq -c -r '.avi.config.cloud.additional_subnets | length' $jsonFile) -gt 
       for tier0 in $(jq -c -r .nsx.config.tier0s[] $jsonFile)
       do
         if [[ $(echo $subnet | jq -c -r .bgp_label) == $(echo $tier0 | jq -c -r .display_name) ]] ; then
-          new_routes=$(echo $new_routes | jq '. += [{"to": "'$(echo $subnet | jq -c -r .cidr)'", "via": "'$(jq -c -r .vcentertfNestedVsphereNsxAviTkgVdsportgroup.nsx_external.tier0_vips["$count"] $jsonFile)'"}]')
-          echo "   +++ Route to $(echo $subnet | jq -c -r .cidr) via $(jq -c -r .vcentertfNestedVsphereNsxAviTkgVdsportgroup.nsx_external.tier0_vips["$count"] $jsonFile) added: OK"
+          new_routes=$(echo $new_routes | jq '. += [{"to": "'$(echo $subnet | jq -c -r .cidr)'", "via": "'$(jq -c -r .vcenter.vds.portgroup.nsx_external.tier0_vips["$count"] $jsonFile)'"}]')
+          echo "   +++ Route to $(echo $subnet | jq -c -r .cidr) via $(jq -c -r .vcenter.vds.portgroup.nsx_external.tier0_vips["$count"] $jsonFile) added: OK"
         fi
         ((count++))
       done
@@ -254,8 +254,8 @@ for segment in $(jq -c -r .nsx.config.segments[] $jsonFile)
 do
   if [[ $(echo $segment | jq -c -r .nsx_external) == true ]] ; then
     ((nsx_segment_external++))
-    cidr=$(jq -c -r .vcentertfNestedVsphereNsxAviTkgVdsportgroup.nsx_external.cidr $jsonFile)
-    echo "   ++++++ Adding CIDR to external segment called $(echo $segment | jq -c -r .name): $(jq -c -r .vcentertfNestedVsphereNsxAviTkgVdsportgroup.nsx_external.cidr $jsonFile)"
+    cidr=$(jq -c -r .vcenter.vds.portgroup.nsx_external.cidr $jsonFile)
+    echo "   ++++++ Adding CIDR to external segment called $(echo $segment | jq -c -r .name): $(jq -c -r .vcenter.vds.portgroup.nsx_external.cidr $jsonFile)"
     new_segment=$(echo $segment | jq '. += {"cidr": "'$(echo $cidr)'"}')
   else
     new_segment=$(echo $segment)
@@ -383,10 +383,10 @@ do
       cidr=$(echo $segment | jq -r .cidr)
     fi
   done
-  if [[ $(echo $(jq -c -r .vcentertfNestedVsphereNsxAviTkgVdsportgroup.nsx_external.name $jsonFile)-pg) == $(echo $network | jq -c -r .name) ]] ; then
+  if [[ $(echo $(jq -c -r .vcenter.vds.portgroup.nsx_external.name $jsonFile)-pg) == $(echo $network | jq -c -r .name) ]] ; then
     avi_cloud_network=1
     echo "   ++++++ Avi cloud network found in NSX external segment: $(echo $network | jq -c -r .name), OK"
-    cidr=$(jq -c -r .vcentertfNestedVsphereNsxAviTkgVdsportgroup.nsx_external.cidr $jsonFile)
+    cidr=$(jq -c -r .vcenter.vds.portgroup.nsx_external.cidr $jsonFile)
   fi
   if [[ $avi_cloud_network -eq 0 ]] ; then
     echo "   ++++++ERROR++++++ $(echo $network | jq -c -r .name) segment not found!!"
