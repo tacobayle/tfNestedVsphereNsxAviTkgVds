@@ -717,7 +717,7 @@
       "avi_app_tcp_port": "8080",
       "hackazon_docker_image": "mutzel/all-in-one-hackazon:postinstall",
       "hackazon_tcp_port": "8081",
-      "network_ref": "my-segment-server-1"
+      "network_ref": "segment-server-1"
     }
   }
 }
