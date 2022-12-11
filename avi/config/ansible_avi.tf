@@ -15,8 +15,8 @@ data "template_file" "avi_values" {
   template = file("templates/values_vcenter.yml.template")
   vars = {
     controllerPrivateIp = jsonencode(cidrhost(var.avi.controller.cidr, var.avi.controller.ip))
-    ntp = var.vcenter.vds.portgroup.management.external_gw_ip
-    dns = var.vcenter.vds.portgroup.management.external_gw_ip
+    ntp = jsonencode(var.vcenter.vds.portgroup.management.external_gw_ip)
+    dns = jsonencode(var.vcenter.vds.portgroup.management.external_gw_ip)
     avi_old_password =  jsonencode(var.avi_old_password)
     avi_password = jsonencode(var.avi_password)
     avi_username = jsonencode(var.avi_username)
