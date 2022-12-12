@@ -413,8 +413,6 @@ if [[ $(echo $avi_json | jq -c -r '.avi.config.virtual_services.http | length') 
     do
       if [[ $(echo $network | jq -c -r .name) == $(echo $vs | jq -c -r '.network_ref') ]] ; then
         cidr=$(echo $network | jq -r .cidr)
-      fi
-      if [[ $(echo $network | jq -c -r .name) == $(echo $vs | jq -c -r '.network_ref') ]] ; then
         type=$(echo $network | jq -r .type)
       fi
     done
@@ -431,8 +429,6 @@ if [[ $(echo $avi_json | jq -c -r '.avi.config.virtual_services.dns | length') -
     do
       if [[ $(echo $network | jq -c -r .name) == $(echo $vs | jq -c -r '.network_ref') ]] ; then
         cidr=$(echo $network | jq -r .cidr)
-      fi
-      if [[ $(echo $network | jq -c -r .name) == $(echo $vs | jq -c -r '.network_ref') ]] ; then
         type=$(echo $network | jq -r .type)
       fi
     done

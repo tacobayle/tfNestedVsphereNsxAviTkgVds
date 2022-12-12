@@ -601,43 +601,6 @@
               "enabled": true,
               "duration": 0
             }
-          },
-          {
-            "name": "seGroupCpuAutoScale",
-            "ha_mode": "HA_MODE_SHARED",
-            "min_scaleout_per_vs": 1,
-            "max_scaleout_per_vs": 2,
-            "max_cpu_usage": 70,
-            "buffer_se": 0,
-            "extra_shared_config_memory": 0,
-            "vcenter_folder": "Avi-SE-Autoscale",
-            "vcpus_per_se": 1,
-            "memory_per_se": 1024,
-            "disk_per_se": 25,
-            "auto_rebalance": true,
-            "auto_rebalance_interval": 30,
-            "auto_rebalance_criteria": [
-              "SE_AUTO_REBALANCE_CPU"
-            ],
-            "realtime_se_metrics": {
-              "enabled": true,
-              "duration": 0
-            }
-          },
-          {
-            "name": "seGroupGslb",
-            "ha_mode": "HA_MODE_SHARED",
-            "min_scaleout_per_vs": 1,
-            "buffer_se": 0,
-            "extra_shared_config_memory": 0,
-            "vcenter_folder": "Avi-SE-GSLB",
-            "vcpus_per_se": 1,
-            "memory_per_se": 1024,
-            "disk_per_se": 25,
-            "realtime_se_metrics": {
-              "enabled": true,
-              "duration": 0
-            }
           }
         ],
         "virtual_services": {
@@ -645,7 +608,7 @@
           "dns": [
             {
               "name": "app-dns",
-              "network_ref": "segment-vip-mgmt",
+              "network_ref": "vip-external-bgp-pg",
               "se_group_ref": "Default-Group",
               "services": [
                 {
@@ -655,8 +618,8 @@
             },
             {
               "name": "app-1",
-              "network_ref": "segment-vip-data",
-              "se_group_ref": "tkg",
+              "network_ref": "vip-external-bgp-pg",
+              "se_group_ref": "Default-Group",
               "services": [
                 {
                   "port": 53
