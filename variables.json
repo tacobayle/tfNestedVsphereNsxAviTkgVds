@@ -146,6 +146,7 @@
           "max_mtu": 1700,
           "netmask": "255.255.255.0",
           "prefix": "24",
+          "cidr": "172.16.130.0/24",
           "external_gw_ip": "172.16.130.100",
           "tier0_vips": ["172.16.130.110", "172.16.130.120"],
           "tier0_ips": ["172.16.130.111", "172.16.130.112", "172.16.130.113", "172.16.130.114"]
@@ -517,7 +518,7 @@
         "networks": [
           {
             "name": "segment-mgmt",
-            "avi_ipam_pool": "200.100.11.210-200.100.11.230",
+            "avi_ipam_pool": "200.100.111.210-200.100.111.230",
             "dhcp_enabled": false,
             "exclude_discovered_subnets": true,
             "management": true,
