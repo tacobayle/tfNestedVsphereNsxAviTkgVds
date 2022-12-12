@@ -26,6 +26,9 @@ vcenter:
     ${ipam}
   cloud:
     name: ${cloud_name}
+    content_lib:
+      name: ${content_lib_name}
+      id: ${content_lib_id}
     dc: ${dc}
     dhcp_enabled: true
     networks: |

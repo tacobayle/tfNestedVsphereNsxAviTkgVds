@@ -27,6 +27,8 @@ data "template_file" "avi_values" {
     tenants = jsonencode(var.avi.config.tenants)
     users = jsonencode(var.avi.config.users)
     domain = jsonencode(var.external_gw.bind.domain)
+    content_lib_name = vsphere_content_library.nested_library_avi.name
+    content_lib_id = vsphere_content_library.nested_library_avi.id
     dc = var.vcenter.datacenter
     ipam = jsonencode(var.avi.config.ipam)
     cloud_name = var.avi.config.cloud.name
