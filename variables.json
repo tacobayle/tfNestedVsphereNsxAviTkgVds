@@ -40,7 +40,8 @@
     "private_key_path": "/home/ubuntu/.ssh/cloudKey",
     "wait_for_guest_net_timeout": 2,
     "username": "ubuntu",
-    "ansible_version": "2.10.7",
+    "ansible_core_version": "2.12.5",
+    "ansible_version": "5.7.1",
     "avi_sdk_version": "22.1.2",
     "netplanFile": "/etc/netplan/50-cloud-init.yaml",
     "bind": {
