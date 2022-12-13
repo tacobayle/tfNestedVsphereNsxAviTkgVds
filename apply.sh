@@ -436,8 +436,8 @@ if [[ $(echo $avi_json | jq -c -r '.avi.config.virtual_services.dns | length') -
     avi_dns_vs=$(echo $avi_dns_vs | jq '. += ['$(echo $new_vs_dns)']')
   done
 fi
-avi_json=$(echo $avi_json | jq '. | del (.avi.config.virtual_services.dns)')
-avi_json=$(echo $avi_json | jq '.avi.config.virtual_services += {"dns": "'$(echo $avi_dns_vs)'"}')
+avi_json=$(echo $avi_json | jq '. | del (.avi.config.cloud.virtual_services.dns)')
+avi_json=$(echo $avi_json | jq '.avi.config.cloud.virtual_services += {"dns": "'$(echo $avi_dns_vs)'"}')
 echo $avi_json | jq . | tee avi.json > /dev/null
 ## checking if Avi IPAM Networks exists in Avi cloud networks
 test_if_ref_from_list_exists_in_another_list ".avi.config.ipam.networks[]" \
